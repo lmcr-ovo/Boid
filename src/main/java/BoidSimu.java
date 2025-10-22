@@ -16,7 +16,7 @@ public class BoidSimu extends Application {
     static final double HEIGHT = 600;
     static final double DEPTH = 600;
     static final int NUM_BOIDS = 500;
-    static final double VIEW_RADIUS = 100;
+    static final double VIEW_RADIUS = 300;
     static final double CAMERA_RADIUS =  DEPTH * 2.5;
 
 

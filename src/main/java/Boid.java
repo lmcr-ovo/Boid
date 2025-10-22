@@ -13,12 +13,12 @@ import java.util.List;
 
 public class Boid {
     static final double maxSpeed = 5;
-    static final double SEPARATION_RANGE = 10;
-    static final double SEPARATION_FACTOR = 5000;
-    static final double ALIGNMENT_RANGE = 20;
+    static final double SEPARATION_RANGE = 100;
+    static final double SEPARATION_FACTOR = 500;
+    static final double ALIGNMENT_RANGE = 100;
     static final double ALIGNMENT_FACTOR = 20;
     static final double COHESION_RANGE = 20;
-    static final double COHESION_FACTOR = 10;
+    static final double COHESION_FACTOR = 50;
     static final double BOUNDARY = 10;
     static final double DAMP = 10;
 
