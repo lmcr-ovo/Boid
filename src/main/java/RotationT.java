@@ -10,8 +10,8 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 public class RotationT extends Application {
-    static double SCENE_WIDTH = 600;
-    static double SCENE_HEIGHT = 600;
+    static double SCENE_WIDTH = 1200;
+    static double SCENE_HEIGHT = 1200;
     @Override
     public void start(Stage stage) throws Exception {
         Group group = new Group();

@@ -12,7 +12,7 @@ import java.text.NumberFormat;
 import java.util.List;
 
 public class Boid {
-    static final double maxSpeed = 30;
+    static final double maxSpeed = 5;
     static final double SEPARATION_RANGE = 10;
     static final double SEPARATION_FACTOR = 5000;
     static final double ALIGNMENT_RANGE = 20;
@@ -21,6 +21,10 @@ public class Boid {
     static final double COHESION_FACTOR = 10;
     static final double BOUNDARY = 10;
     static final double DAMP = 10;
+
+    static final double WIDTH = 600;
+    static final double HEIGHT = 600;
+    static final double DEPTH = 600;
     static NumberFormat nf = format();
     static int count = 0;
     static Rotate RotateZero = new Rotate(0, 0, 0, 0, Rotate.Z_AXIS);
@@ -66,7 +70,7 @@ public class Boid {
     public static Boid createBoidShape(double x, double y, double z) {
         Boid b = new Boid(x, y, z);
 
-        Cylinder cyl = new Cylinder(10, 20);
+        Cylinder cyl = new Cylinder(1, 10);
         cyl.setMaterial(new PhongMaterial(Color.RED));
 
         b.shape = cyl;
@@ -123,7 +127,7 @@ public class Boid {
 
 
     public void update(List<Node<Boid>> adj) {
-        check1();
+        //check1();
         System.out.println("\n===== 进入 Boid.update =====");
         System.out.printf("Boid ID: %d%n当前位置: (%.2f, %.2f, %.2f)%n当前速度: (%.2f, %.2f, %.2f)%n邻居数量: %d%n",
                 id, x, y, z, vx, vy, vz, adj.size());
@@ -150,6 +154,15 @@ public class Boid {
         vx = velocity.getX();
         vy = velocity.getY();
         vz = velocity.getZ();
+
+        x += vx;
+        y += vy;
+        z += vz;
+
+
+        if (x + vx > WIDTH/2 || x + vx < -WIDTH/2) vx = -vx * 0.5;
+        if (y + vy > HEIGHT/2 || y + vy < -HEIGHT/2) vy = -vy * 0.5;
+        if (z + vz > DEPTH/2 || z + vz < -DEPTH/2) vz = -vz * 0.5;
 
         x += vx;
         y += vy;
@@ -274,21 +287,45 @@ public class Boid {
 
 
     private void bound() {
-        if (x < 0) x += 800;
-        if (x > 800) x -= 800;
-        if (y < 0) y += 600;
-        if (y > 600) y -= 600;
-        if (z < 0) z += 600;
-        if (z > 600) z -= 600;
+        double halfW = WIDTH / 2;
+        double halfH = HEIGHT / 2;
+        double halfD = DEPTH / 2;
+
+        if (x < -halfW) {
+            x = -halfW;
+            vx = -vx * 0.5;
+        }
+        if (x > halfW) {
+            x = halfW;
+            vx = -vx * 0.5;
+        }
+        if (y < -halfH) {
+            y = -halfH;
+            vy = -vy * 0.5;
+        }
+        if (y > halfH) {
+            y = halfH;
+            vy = -vy * 0.5;
+        }
+        if (z < -halfD) {
+            z = -halfD;
+            vz = -vz * 0.5;
+        }
+        if (z > halfD) {
+            z = halfD;
+            vz = -vz * 0.5;
+        }
     }
 
+
+
     private void check1() {
-        if (x < BOUNDARY) vx += DAMP;
-        if (x > 800 - BOUNDARY) vx -= DAMP;
-        if (y < BOUNDARY) vy += DAMP;
-        if (y > 600 - BOUNDARY) vy -= DAMP;
-        if (z < DAMP) vz += DAMP;
-        if (z > 600 - BOUNDARY) vz -= DAMP;
+        if (x < -WIDTH / 2 + BOUNDARY) vx += DAMP;
+        if (x > WIDTH / 2 - BOUNDARY) vx -= DAMP;
+        if (y < -HEIGHT / 2 + BOUNDARY) vy += DAMP;
+        if (y > HEIGHT / 2 - BOUNDARY) vy -= DAMP;
+        if (z < -DEPTH / 2 + BOUNDARY) vz += DAMP;
+        if (z > DEPTH / 2 + BOUNDARY) vz -= DAMP;
     }
 
     private static double distance(Boid b1, Boid b2) {
@@ -316,32 +353,41 @@ public class Boid {
         nf.setMinimumFractionDigits(2);
         return nf;
     }
-
-    class SmartGroup extends Group {
-
-        Rotate r;
-        Transform t = new Rotate();
-
-        void rotateByX(int ang) {
-            r = new Rotate(ang, Rotate.X_AXIS);
-            t = t.createConcatenation(r);
-            this.getTransforms().clear();
-            this.getTransforms().addAll(t);
+    public void checkShape() {
+        double x = shape.getTranslateX();
+        double y = shape.getTranslateY();
+        double z = shape.getTranslateZ();
+        if (shape.getTranslateX() < - WIDTH / 2 || x > WIDTH / 2) {
+            System.out.println("x!");
+            System.out.println(this);
+            System.exit(1);
         }
-
-        void rotateByY(int ang) {
-            r = new Rotate(ang, Rotate.Y_AXIS);
-            t = t.createConcatenation(r);
-            this.getTransforms().clear();
-            this.getTransforms().addAll(t);
+        if (y < - HEIGHT / 2 || y > HEIGHT / 2) {
+            System.out.println("y!");
+            System.out.println(this);
+            System.exit(1);
         }
-
-
-        void rotateByZ(int ang) {
-            r = new Rotate(ang, Rotate.Z_AXIS);
-            t = t.createConcatenation(r);
-            this.getTransforms().clear();
-            this.getTransforms().addAll(t);
+        if (z < - DEPTH / 2 || z > DEPTH / 2) {
+            System.out.println("z");
+            System.out.println(z);
+            System.exit(1);
         }
     }
+
+
+
+    public void checkShapeGlobal() {
+        Point3D globalPos = shape.localToScene(Point3D.ZERO);
+        double gx = globalPos.getX();
+        double gy = globalPos.getY();
+        double gz = globalPos.getZ();
+        if (gx < -WIDTH/2 || gx > WIDTH/2 ||
+                gy < -HEIGHT/2 || gy > HEIGHT/2 ||
+                gz < -DEPTH/2 || gz > DEPTH/2) {
+            System.out.println("越界!");
+            System.out.println("全局坐标: " + globalPos);
+            System.exit(1);
+        }
+    }
+
 }
